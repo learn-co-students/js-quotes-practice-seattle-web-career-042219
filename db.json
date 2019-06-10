@@ -3,12 +3,16 @@
     {
       "id": 2,
       "quote": "There are no secrets to success. It is the result of preparation, hard work, and learning from failure.",
-      "author": "Collin Powell"
+      "author": "Collin Powell",
+      "quoteId": 2,
+      "likes": 7
     },
     {
       "id": 3,
       "quote": "Don't count the days, make the days count.",
-      "author": "Mike Tyson"
+      "author": "Mike Tyson",
+      "quoteId": 3,
+      "likes": 1
     },
     {
       "id": 4,
@@ -39,11 +43,6 @@
       "id": 9,
       "quote": "Our greatest glory is not in never falling, but in rising everytime we fall.",
       "author": "Confucius"
-    },
-    {
-      "id": 10,
-      "quote": "You know, failure hurts. Any kind of failure stings. If you live in the sting, you will undoubtedly fail. My way of getting past the sting is to say no, I’m just not going to let this get me down.",
-      "author": "Sonia Sotomayor"
     }
   ],
   "likes": [

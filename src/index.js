@@ -38,10 +38,10 @@ function displayQuote(quote) {
   const likeButton = document.createElement("button");
   likeButton.textContent = "Likes: ";
   likeButton.className = "btn-success";
-  likeButton.addEventListener('click', addLikes);
   const numLikes = document.createElement("span");
   numLikes.textContent = 0;
   likeButton.appendChild(numLikes);
+  likeButton.addEventListener('click', addLikes);
   const delButton = document.createElement("button");
   delButton.textContent = "Delete";
   delButton.className = "btn-danger";
@@ -71,14 +71,37 @@ function addQuote(event) {
 }
 
 function addLikes(event) {
-  let likes = event.target.getElementsByTagName("span")[0].textContent;
-  event.target.getElementsByTagName("span")[0].textContent = parseInt(likes) + 1;
+  event.preventDefault();
+  console.log(event.target.children[0].textContent);
+  let likes = parseInt(event.target.children[0].textContent);
+  const quoteBlock = event.target.parentElement;
+  const quote = quoteBlock.querySelector("p");
+  fetch(URL + `/${quote.className.split("-")[1]}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-type': 'application/json'
+    },
+    body: JSON.stringify({quoteId: parseInt(quote.className.split("-")[1]), likes: likes + 1})
+  })
+  .then(resp => resp.json())
+  .then(json => updateLikes(json, event.target))
+
+
+  //let likes = event.target.getElementsByTagName("span")[0].textContent;
+  //event.target.getElementsByTagName("span")[0].textContent = parseInt(likes) + 1;
+}
+
+function updateLikes(quote, button) {
+  //let likes = event.target.getElementsByTagName("span")[0].textContent;
+  button.children[0].textContent = quote.likes;
+  //document.querySelector(`p.mb-${quote.quoteId}`).textContent = quote.like;
 }
 
 function deleteQuote(event) {
   const quoteBlock = event.target.parentElement;
   const quote = quoteBlock.querySelector("p");
   console.log(quote.className.split("-")[1]);
+  let quoteId = getQuoteId();
   const listQuote = quoteBlock.parentElement;
   fetch(URL + `/${quote.className.split("-")[1]}`, {
     method: 'DELETE'
