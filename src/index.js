@@ -186,23 +186,61 @@ function incrementLikes(quote) {
 }
 
 function populateEdit(li, quote) {
-  document.getElementById("new-quote").value = quote.quote;
-  document.getElementById("author").value = quote.author;
-  document.getElementsByClassName("btn btn-primary").innerText = "Update";
+  const editDiv = document.createElement("div");
+
+  const editForm = document.createElement("form");
+  editForm.setAttribute("id", "edit-quote-form");
+  editForm.setAttribute("class", "hidden");
+
+  const quoteDiv = document.createElement("div");
+  quoteDiv.setAttribute("class", "form-group");
+
+  const editQuoteInput = document.createElement("input");
+  editQuoteInput.setAttribute("type", "text");
+  editQuoteInput.setAttribute("id", "edit-quote");
+  editQuoteInput.setAttribute("class", "form-control");
+
+  const quoteLabel = document.createElement("label");
+  quoteLabel.setAttribute("for", editQuoteInput);
+
+  const authorDiv = document.createElement("div");
+  authorDiv.setAttribute("class", "form-group");
+
+  const editAuthorInput = document.createElement("input");
+  editAuthorInput.setAttribute("type", "text");
+  editAuthorInput.setAttribute("id", "edit-author");
+  editAuthorInput.setAttribute("class", "form-control");
+
+  const authorLabel = document.createElement("label");
+  authorLabel.setAttribute("for", editAuthorInput);
+
+  const editSubmitBtn = document.createElement("button");
+  editSubmitBtn.setAttribute("id", "edit-submit");
+  editSubmitBtn.setAttribute("type", "submit");
+  editSubmitBtn.setAttribute("class", "btn btn-info");
+  editSubmitBtn.innerText = "Submit Edit";
+  editSubmitBtn.addEventListener("submit", e => {
+    e.preventDefault();
+    handlePatch(li);
+  });
+
+  document.getElementById("edit-quote").value = quote.quote;
+  document.getElementById("edit-author").value = quote.author;
 }
 
-//   fetch(url + "/" + quote.id, {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//       Accept: "application/json"
-//     },
-//     body: JSON.stringify({ quote: quote.quote, author: quote.author })
-//   })
-//     .then(res => res.json())
-//     .then(updateLi(li, newQuote, newAuthor))
-//     .catch(err => console.log(err));
-// }
+function handlePatch(li) {
+  fetch(url + "/" + quote.id, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    },
+    body: JSON.stringify({ quote: quote.quote, author: quote.author })
+  })
+    .then(res => res.json())
+    .then(updateLi(li, newQuote, newAuthor))
+    .catch(err => console.log(err));
+}
 
 function updateLi(li, newQuote, newAuthor) {
   console.log("updateLi fires");
