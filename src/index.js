@@ -186,19 +186,21 @@ function incrementLikes(quote) {
 }
 
 function populateEdit(li, quote) {
+  const mainDiv = document.getElementById("main-div");
+
   const editDiv = document.createElement("div");
 
   const editForm = document.createElement("form");
   editForm.setAttribute("id", "edit-quote-form");
-  editForm.setAttribute("class", "hidden");
+  // editForm.setAttribute("class", "hidden");
 
   const quoteDiv = document.createElement("div");
   quoteDiv.setAttribute("class", "form-group");
 
   const editQuoteInput = document.createElement("input");
   editQuoteInput.setAttribute("type", "text");
-  editQuoteInput.setAttribute("id", "edit-quote");
   editQuoteInput.setAttribute("class", "form-control");
+  editQuoteInput.setAttribute("id", "edit-quote");
 
   const quoteLabel = document.createElement("label");
   quoteLabel.setAttribute("for", editQuoteInput);
@@ -208,8 +210,8 @@ function populateEdit(li, quote) {
 
   const editAuthorInput = document.createElement("input");
   editAuthorInput.setAttribute("type", "text");
-  editAuthorInput.setAttribute("id", "edit-author");
   editAuthorInput.setAttribute("class", "form-control");
+  editAuthorInput.setAttribute("id", "edit-author");
 
   const authorLabel = document.createElement("label");
   authorLabel.setAttribute("for", editAuthorInput);
@@ -224,8 +226,20 @@ function populateEdit(li, quote) {
     handlePatch(li);
   });
 
-  document.getElementById("edit-quote").value = quote.quote;
-  document.getElementById("edit-author").value = quote.author;
+  quoteDiv.appendChild(editQuoteInput);
+  quoteDiv.appendChild(quoteLabel);
+  authorDiv.appendChild(editAuthorInput);
+  authorDiv.appendChild(authorLabel);
+
+  editForm.appendChild(quoteDiv);
+  editForm.appendChild(authorDiv);
+
+  // editDiv.appendChild(editForm);
+
+  mainDiv.appendChild(editForm);
+
+  editQuoteInput.value = quote.quote;
+  editAuthorInput.value = quote.author;
 }
 
 function handlePatch(li) {
