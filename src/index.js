@@ -9,9 +9,17 @@ function addListeners() {
     e.preventDefault();
     postQuote(e);
   });
+  const sortBtn = document
+    .getElementById("sort-button")
+    .addEventListener("click", e => {
+      e.preventDefault();
+      sortQuotes();
+    });
 }
 
-const getUrl = "http://localhost:3000/quotes?_embed=likes";
+// const getUrl = "http://localhost:3000/quotes?_embed=likes";
+const getUrl = "http://localhost:3000/quotes?_sort=author";
+// sorted url
 const url = "http://localhost:3000/quotes";
 const likesUrl = "http://localhost:3000/likes";
 
@@ -54,7 +62,7 @@ function loadQuote(quote) {
   });
 
   const likesSpan = document.createElement("span");
-  likesSpan.innerText = quote.likes.length;
+  quote.likes ? (likesSpan.innerText = quote.likes.length) : "";
 
   const deleteBtn = document.createElement("button");
   deleteBtn.setAttribute("class", "btn-danger");
@@ -85,6 +93,8 @@ function loadQuote(quote) {
 
   quoteList.appendChild(li);
 }
+
+// POST
 
 function postQuote(e) {
   const newQuote = e.target[0].value;
@@ -188,11 +198,8 @@ function incrementLikes(quote) {
 function populateEdit(li, quote) {
   const mainDiv = document.getElementById("main-div");
 
-  const editDiv = document.createElement("div");
-
   const editForm = document.createElement("form");
   editForm.setAttribute("id", "edit-quote-form");
-  // editForm.setAttribute("class", "hidden");
 
   const quoteDiv = document.createElement("div");
   quoteDiv.setAttribute("class", "form-group");
@@ -204,6 +211,7 @@ function populateEdit(li, quote) {
 
   const quoteLabel = document.createElement("label");
   quoteLabel.setAttribute("for", editQuoteInput);
+  quoteLabel.innerHTML = "New Quote";
 
   const authorDiv = document.createElement("div");
   authorDiv.setAttribute("class", "form-group");
@@ -215,26 +223,31 @@ function populateEdit(li, quote) {
 
   const authorLabel = document.createElement("label");
   authorLabel.setAttribute("for", editAuthorInput);
+  authorLabel.innerHTML = "Author";
 
   const editSubmitBtn = document.createElement("button");
   editSubmitBtn.setAttribute("id", "edit-submit");
   editSubmitBtn.setAttribute("type", "submit");
   editSubmitBtn.setAttribute("class", "btn btn-info");
   editSubmitBtn.innerText = "Submit Edit";
-  editSubmitBtn.addEventListener("submit", e => {
+
+  editForm.addEventListener("submit", e => {
     e.preventDefault();
-    handlePatch(li);
+    handlePatch(li, quote, editQuoteInput, editAuthorInput);
   });
 
-  quoteDiv.appendChild(editQuoteInput);
+  let hr = document.createElement("hr");
+  mainDiv.appendChild(hr);
+
   quoteDiv.appendChild(quoteLabel);
-  authorDiv.appendChild(editAuthorInput);
+  quoteDiv.appendChild(editQuoteInput);
+
   authorDiv.appendChild(authorLabel);
+  authorDiv.appendChild(editAuthorInput);
 
   editForm.appendChild(quoteDiv);
   editForm.appendChild(authorDiv);
-
-  // editDiv.appendChild(editForm);
+  editForm.appendChild(editSubmitBtn);
 
   mainDiv.appendChild(editForm);
 
@@ -242,20 +255,27 @@ function populateEdit(li, quote) {
   editAuthorInput.value = quote.author;
 }
 
-function handlePatch(li) {
+function handlePatch(li, quote, editQuoteInput, editAuthorInput) {
   fetch(url + "/" + quote.id, {
-    method: "POST",
+    method: "PATCH",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json"
     },
-    body: JSON.stringify({ quote: quote.quote, author: quote.author })
+    body: JSON.stringify({
+      quote: editQuoteInput.value,
+      author: editAuthorInput.value
+    })
   })
     .then(res => res.json())
-    .then(updateLi(li, newQuote, newAuthor))
+    .then(res => console.log(res))
+    .then(updateLi(li, editQuoteInput, editAuthorInput))
     .catch(err => console.log(err));
 }
 
-function updateLi(li, newQuote, newAuthor) {
+function updateLi(li, editQuoteInput, editAuthorInput) {
   console.log("updateLi fires");
+
+  li.childNodes[0].childNodes[0].innerText = editQuoteInput.value;
+  li.childNodes[0].childNodes[1].innerText = editAuthorInput.value;
 }

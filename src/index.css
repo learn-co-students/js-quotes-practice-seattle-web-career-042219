@@ -9,3 +9,7 @@ li {
 .hidden {
   display: none;
 }
+
+body {
+  margin: 40px;
+}
