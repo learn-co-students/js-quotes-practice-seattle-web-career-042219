@@ -9,19 +9,35 @@ function addListeners() {
     e.preventDefault();
     postQuote(e);
   });
-  const sortBtn = document
-    .getElementById("sort-button")
-    .addEventListener("click", e => {
-      e.preventDefault();
-      sortQuotes();
-    });
+  const sortBtn = document.getElementById("sort-button");
+  sortBtn.addEventListener("click", e => {
+    e.preventDefault();
+    getSortQuotes();
+  });
 }
 
-// const getUrl = "http://localhost:3000/quotes?_embed=likes";
-const getUrl = "http://localhost:3000/quotes?_sort=author";
+const getUrl = "http://localhost:3000/quotes?_embed=likes";
+// const getUrl = "http://localhost:3000/quotes?_sort=author";
 // sorted url
 const url = "http://localhost:3000/quotes";
 const likesUrl = "http://localhost:3000/likes";
+
+function getSortQuotes() {
+  fetch(getUrl)
+    .then(res => res.json())
+    .then(quotes => sortQuotes(quotes))
+    .catch(err => console.log(err));
+}
+
+function sortQuotes(quotes) {
+  const quoteList = document.getElementById("quote-list");
+  quoteList.innerHTML = "";
+  let newQuotes = [...quotes];
+  newQuotes.sort(function(a, b) {
+    return a.author < b.author ? -1 : 1;
+  });
+  newQuotes.forEach(quote => loadQuote(quote));
+}
 
 function getCall() {
   fetch(getUrl)
@@ -31,6 +47,8 @@ function getCall() {
 }
 
 function loadQuotes(quotes) {
+  const quoteList = document.getElementById("quote-list");
+  quoteList.innerHTML = "";
   quotes.forEach(quote => loadQuote(quote));
 }
 
@@ -274,8 +292,6 @@ function handlePatch(li, quote, editQuoteInput, editAuthorInput) {
 }
 
 function updateLi(li, editQuoteInput, editAuthorInput) {
-  console.log("updateLi fires");
-
   li.childNodes[0].childNodes[0].innerText = editQuoteInput.value;
   li.childNodes[0].childNodes[1].innerText = editAuthorInput.value;
 }
