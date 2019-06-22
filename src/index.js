@@ -76,7 +76,7 @@ function loadQuote(quote) {
   likesBtn.innerText = "Likes: ";
   likesBtn.addEventListener("click", e => {
     e.preventDefault();
-    incrementLikes(quote);
+    incrementLikes(quote, li);
   });
 
   const likesSpan = document.createElement("span");
@@ -129,7 +129,7 @@ function postQuote(e) {
   })
     .then(res => res.json())
     .then(res => pessRender(newQuote, newAuthor, res))
-    .then(json => console.log(json))
+    // .then(json => console.log(json))
     .catch(err => console.log(err));
 }
 
@@ -199,7 +199,7 @@ function handleDelete(li, res) {
     .catch(err => console.log(err));
 }
 
-function incrementLikes(quote) {
+function incrementLikes(quote, li) {
   fetch(likesUrl, {
     method: "POST",
     headers: {
@@ -210,10 +210,26 @@ function incrementLikes(quote) {
       quoteId: parseInt(quote.id, 10),
       createdAt: Date.now()
     })
-  });
+  })
+    .then(res => res.json())
+    .then(res => console.log(res))
+    .then(pessRenderLikes(quote, li))
+    .catch(err => console.log(err));
+}
+
+function pessRenderLikes(quote, li) {
+  let likeValue = parseInt(
+    li.childNodes[0].childNodes[3].innerText.split(" ")[1],
+    10
+  );
+  likeValue++;
+  li.childNodes[0].childNodes[3].innerText = `Likes: ${likeValue}`;
 }
 
 function populateEdit(li, quote) {
+  if (document.getElementById("edit-quote-form")) {
+    document.getElementById("edit-quote-form").innerHTML = "";
+  }
   const mainDiv = document.getElementById("main-div");
 
   const editForm = document.createElement("form");
@@ -294,4 +310,5 @@ function handlePatch(li, quote, editQuoteInput, editAuthorInput) {
 function updateLi(li, editQuoteInput, editAuthorInput) {
   li.childNodes[0].childNodes[0].innerText = editQuoteInput.value;
   li.childNodes[0].childNodes[1].innerText = editAuthorInput.value;
+  document.getElementById("edit-quote-form").innerHTML = "";
 }
