@@ -1,7 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-  getCall();
   addListeners();
+  getCall();
 });
+
+let viewSortedResponse = false;
 
 function addListeners() {
   const newQuoteForm = document.getElementById("new-quote-form");
@@ -12,32 +14,39 @@ function addListeners() {
   const sortBtn = document.getElementById("sort-button");
   sortBtn.addEventListener("click", e => {
     e.preventDefault();
-    getSortQuotes();
+    sortButtonToggler();
+  });
+  const sortInServerBtn = document.getElementById("sort-button-server");
+  sortInServerBtn.addEventListener("click", e => {
+    e.preventDefault();
+    getSortedQuotes();
   });
 }
 
+const getSortedUrl = "http://localhost:3000/quotes?_sort=author";
 const getUrl = "http://localhost:3000/quotes?_embed=likes";
-// const getUrl = "http://localhost:3000/quotes?_sort=author";
-// sorted url
 const url = "http://localhost:3000/quotes";
 const likesUrl = "http://localhost:3000/likes";
 
-function getSortQuotes() {
-  fetch(getUrl)
+//Get sorted from server
+
+function getSortedQuotes() {
+  fetch(getSortedUrl)
     .then(res => res.json())
-    .then(quotes => sortQuotes(quotes))
+    .then(quotes => loadQuotes(quotes))
     .catch(err => console.log(err));
 }
 
-function sortQuotes(quotes) {
-  const quoteList = document.getElementById("quote-list");
-  quoteList.innerHTML = "";
-  let newQuotes = [...quotes];
-  newQuotes.sort(function(a, b) {
-    return a.author < b.author ? -1 : 1;
-  });
-  newQuotes.forEach(quote => loadQuote(quote));
+function sortButtonToggler() {
+  const sortBtn = document.getElementById("sort-button");
+  viewSortedResponse = !viewSortedResponse;
+  viewSortedResponse
+    ? (sortBtn.innerText = "View Unsorted")
+    : (sortBtn.innerText = "View Sorted");
+  getCall();
 }
+
+// GET from endpoint
 
 function getCall() {
   fetch(getUrl)
@@ -49,7 +58,14 @@ function getCall() {
 function loadQuotes(quotes) {
   const quoteList = document.getElementById("quote-list");
   quoteList.innerHTML = "";
-  quotes.forEach(quote => loadQuote(quote));
+
+  let newQuotes = [...quotes];
+  if (viewSortedResponse) {
+    newQuotes.sort(function(a, b) {
+      return a.author < b.author ? -1 : 1;
+    });
+  }
+  newQuotes.forEach(quote => loadQuote(quote));
 }
 
 function loadQuote(quote) {
@@ -80,7 +96,9 @@ function loadQuote(quote) {
   });
 
   const likesSpan = document.createElement("span");
-  quote.likes ? (likesSpan.innerText = quote.likes.length) : "";
+  quote.likes
+    ? (likesSpan.innerText = quote.likes.length)
+    : (likesSpan.innerText = 0);
 
   const deleteBtn = document.createElement("button");
   deleteBtn.setAttribute("class", "btn-danger");
@@ -128,76 +146,84 @@ function postQuote(e) {
     body: JSON.stringify({ quote: newQuote, author: newAuthor })
   })
     .then(res => res.json())
-    .then(res => pessRender(newQuote, newAuthor, res))
+    .then(quote => loadQuote(quote))
     // .then(json => console.log(json))
     .catch(err => console.log(err));
 }
 
-function pessRender(newQuote, newAuthor, res) {
-  const quoteList = document.getElementById("quote-list");
+// function pessRender(newQuote, newAuthor, res, e) {
+//   const quoteList = document.getElementById("quote-list");
 
-  const li = document.createElement("li");
-  li.setAttribute("class", "quote-card");
+//   const li = document.createElement("li");
+//   li.setAttribute("class", "quote-card");
 
-  const blockquote = document.createElement("blockquote");
-  blockquote.setAttribute("class", "blockquote");
+//   const blockquote = document.createElement("blockquote");
+//   blockquote.setAttribute("class", "blockquote");
 
-  const p = document.createElement("p");
-  p.setAttribute("class", "mb-0");
-  p.innerText = newQuote;
+//   const p = document.createElement("p");
+//   p.setAttribute("class", "mb-0");
+//   p.innerText = newQuote;
 
-  const footer = document.createElement("footer");
-  footer.setAttribute("class", "blockquote-footer");
-  footer.innerText = newAuthor;
+//   const footer = document.createElement("footer");
+//   footer.setAttribute("class", "blockquote-footer");
+//   footer.innerText = newAuthor;
 
-  const br = document.createElement("br");
+//   const br = document.createElement("br");
 
-  const likesBtn = document.createElement("button");
-  likesBtn.setAttribute("class", "btn-success");
-  likesBtn.innerText = "Likes: ";
+//   const likesBtn = document.createElement("button");
+//   likesBtn.setAttribute("class", "btn-success");
+//   likesBtn.innerText = "Likes: ";
+//   likesBtn.addEventListener("click", e => {
+//     e.preventDefault();
+//     incrementLikes(quote, li);
+//   });
 
-  const likesSpan = document.createElement("span");
-  likesSpan.innerText = 0;
+//   const likesSpan = document.createElement("span");
+//   quote.likes ? (likesSpan.innerText = quote.likes.length) : 0;
 
-  const deleteBtn = document.createElement("button");
-  deleteBtn.setAttribute("class", "btn-danger");
-  deleteBtn.innerText = "Delete";
-  deleteBtn.addEventListener("click", e => {
-    e.preventDefault();
-    handleDelete(li, res);
-  });
+//   const deleteBtn = document.createElement("button");
+//   deleteBtn.setAttribute("class", "btn-danger");
+//   deleteBtn.innerText = "Delete";
+//   deleteBtn.addEventListener("click", e => {
+//     e.preventDefault();
+//     handleDelete(li, res);
+//   });
 
-  const editBtn = document.createElement("button");
-  editBtn.setAttribute("class", "btn-info");
-  editBtn.innerText = "Edit";
-  editBtn.addEventListener("click", e => {
-    e.preventDefault();
-    populateEdit(li, quote);
-  });
+//   const editBtn = document.createElement("button");
+//   editBtn.setAttribute("class", "btn-info");
+//   editBtn.innerText = "Edit";
+//   editBtn.addEventListener("click", e => {
+//     e.preventDefault();
+//     populateEdit(li, quote);
+//   });
 
-  likesBtn.appendChild(likesSpan);
+//   likesBtn.appendChild(likesSpan);
 
-  blockquote.appendChild(p);
-  blockquote.appendChild(footer);
-  blockquote.appendChild(br);
-  blockquote.appendChild(likesBtn);
-  blockquote.appendChild(deleteBtn);
-  blockquote.appendChild(editBtn);
+//   blockquote.appendChild(p);
+//   blockquote.appendChild(footer);
+//   blockquote.appendChild(br);
+//   blockquote.appendChild(likesBtn);
+//   blockquote.appendChild(deleteBtn);
+//   blockquote.appendChild(editBtn);
 
-  li.appendChild(blockquote);
+//   li.appendChild(blockquote);
 
-  quoteList.appendChild(li);
-}
+//   quoteList.appendChild(li);
+// }
+
+// Delete
 
 function handleDelete(li, res) {
   fetch(url + "/" + res.id, {
     method: "DELETE"
   })
     .then(res => res.json)
-    .then(res => console.log(res))
+    // .then(res => console.log(res))
     .then(li.remove())
     .catch(err => console.log(err));
 }
+
+// Likes
 
 function incrementLikes(quote, li) {
   fetch(likesUrl, {
@@ -212,12 +238,12 @@ function incrementLikes(quote, li) {
     })
   })
     .then(res => res.json())
-    .then(res => console.log(res))
-    .then(pessRenderLikes(quote, li))
+    // .then(res => console.log(res))
+    .then(pessRenderLikes(li))
     .catch(err => console.log(err));
 }
 
-function pessRenderLikes(quote, li) {
+function pessRenderLikes(li) {
   let likeValue = parseInt(
     li.childNodes[0].childNodes[3].innerText.split(" ")[1],
     10
@@ -225,6 +251,8 @@ function pessRenderLikes(quote, li) {
   likeValue++;
   li.childNodes[0].childNodes[3].innerText = `Likes: ${likeValue}`;
 }
+
+// Edit
 
 function populateEdit(li, quote) {
   if (document.getElementById("edit-quote-form")) {
@@ -244,7 +272,7 @@ function populateEdit(li, quote) {
   editQuoteInput.setAttribute("id", "edit-quote");
 
   const quoteLabel = document.createElement("label");
-  quoteLabel.setAttribute("for", editQuoteInput);
+  quoteLabel.setAttribute("for", editQuoteInput.id);
   quoteLabel.innerHTML = "New Quote";
 
   const authorDiv = document.createElement("div");
@@ -256,7 +284,7 @@ function populateEdit(li, quote) {
   editAuthorInput.setAttribute("id", "edit-author");
 
   const authorLabel = document.createElement("label");
-  authorLabel.setAttribute("for", editAuthorInput);
+  authorLabel.setAttribute("for", editAuthorInput.id);
   authorLabel.innerHTML = "Author";
 
   const editSubmitBtn = document.createElement("button");
@@ -267,11 +295,11 @@ function populateEdit(li, quote) {
 
   editForm.addEventListener("submit", e => {
     e.preventDefault();
-    handlePatch(li, quote, editQuoteInput, editAuthorInput);
+    handlePatch(li, quote);
   });
 
   let hr = document.createElement("hr");
-  mainDiv.appendChild(hr);
+  editForm.appendChild(hr);
 
   quoteDiv.appendChild(quoteLabel);
   quoteDiv.appendChild(editQuoteInput);
@@ -285,11 +313,16 @@ function populateEdit(li, quote) {
 
   mainDiv.appendChild(editForm);
 
-  editQuoteInput.value = quote.quote;
-  editAuthorInput.value = quote.author;
+  // editQuoteInput.value = quote.quote;
+  // editAuthorInput.value = quote.author;
+
+  editQuoteInput.value = li.childNodes[0].childNodes[0].innerText;
+  editAuthorInput.value = li.childNodes[0].childNodes[1].innerText;
 }
 
-function handlePatch(li, quote, editQuoteInput, editAuthorInput) {
+function handlePatch(li, quote) {
+  let editQuoteInput = document.getElementById("edit-quote").value;
+  let editAuthorInput = document.getElementById("edit-author").value;
   fetch(url + "/" + quote.id, {
     method: "PATCH",
     headers: {
@@ -297,18 +330,18 @@ function handlePatch(li, quote, editQuoteInput, editAuthorInput) {
       Accept: "application/json"
     },
     body: JSON.stringify({
-      quote: editQuoteInput.value,
-      author: editAuthorInput.value
+      quote: editQuoteInput,
+      author: editAuthorInput
     })
   })
     .then(res => res.json())
-    .then(res => console.log(res))
+    // .then(res => console.log(res))
     .then(updateLi(li, editQuoteInput, editAuthorInput))
     .catch(err => console.log(err));
 }
 
 function updateLi(li, editQuoteInput, editAuthorInput) {
-  li.childNodes[0].childNodes[0].innerText = editQuoteInput.value;
-  li.childNodes[0].childNodes[1].innerText = editAuthorInput.value;
-  document.getElementById("edit-quote-form").innerHTML = "";
+  li.childNodes[0].childNodes[0].innerText = editQuoteInput;
+  li.childNodes[0].childNodes[1].innerText = editAuthorInput;
+  document.getElementById("edit-quote-form").remove();
 }
