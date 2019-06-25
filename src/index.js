@@ -151,78 +151,6 @@ function postQuote(e) {
     .catch(err => console.log(err));
 }
 
-// function pessRender(newQuote, newAuthor, res, e) {
-//   const quoteList = document.getElementById("quote-list");
-
-//   const li = document.createElement("li");
-//   li.setAttribute("class", "quote-card");
-
-//   const blockquote = document.createElement("blockquote");
-//   blockquote.setAttribute("class", "blockquote");
-
-//   const p = document.createElement("p");
-//   p.setAttribute("class", "mb-0");
-//   p.innerText = newQuote;
-
-//   const footer = document.createElement("footer");
-//   footer.setAttribute("class", "blockquote-footer");
-//   footer.innerText = newAuthor;
-
-//   const br = document.createElement("br");
-
-//   const likesBtn = document.createElement("button");
-//   likesBtn.setAttribute("class", "btn-success");
-//   likesBtn.innerText = "Likes: ";
-//   likesBtn.addEventListener("click", e => {
-//     e.preventDefault();
-//     incrementLikes(quote, li);
-//   });
-
-//   const likesSpan = document.createElement("span");
-//   quote.likes ? (likesSpan.innerText = quote.likes.length) : 0;
-
-//   const deleteBtn = document.createElement("button");
-//   deleteBtn.setAttribute("class", "btn-danger");
-//   deleteBtn.innerText = "Delete";
-//   deleteBtn.addEventListener("click", e => {
-//     e.preventDefault();
-//     handleDelete(li, res);
-//   });
-
-//   const editBtn = document.createElement("button");
-//   editBtn.setAttribute("class", "btn-info");
-//   editBtn.innerText = "Edit";
-//   editBtn.addEventListener("click", e => {
-//     e.preventDefault();
-//     populateEdit(li, quote);
-//   });
-
-//   likesBtn.appendChild(likesSpan);
-
-//   blockquote.appendChild(p);
-//   blockquote.appendChild(footer);
-//   blockquote.appendChild(br);
-//   blockquote.appendChild(likesBtn);
-//   blockquote.appendChild(deleteBtn);
-//   blockquote.appendChild(editBtn);
-
-//   li.appendChild(blockquote);
-
-//   quoteList.appendChild(li);
-// }
-
-// Delete
-
-function handleDelete(li, res) {
-  fetch(url + "/" + res.id, {
-    method: "DELETE"
-  })
-    .then(res => res.json)
-    // .then(res => console.log(res))
-    .then(li.remove())
-    .catch(err => console.log(err));
-}
-
 // Likes
 
 function incrementLikes(quote, li) {
@@ -344,4 +272,16 @@ function updateLi(li, editQuoteInput, editAuthorInput) {
   li.childNodes[0].childNodes[0].innerText = editQuoteInput;
   li.childNodes[0].childNodes[1].innerText = editAuthorInput;
   document.getElementById("edit-quote-form").remove();
+}
+
+// Delete
+
+function handleDelete(li, res) {
+  fetch(url + "/" + res.id, {
+    method: "DELETE"
+  })
+    .then(res => res.json)
+    // .then(res => console.log(res))
+    .then(li.remove())
+    .catch(err => console.log(err));
 }
